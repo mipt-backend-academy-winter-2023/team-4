@@ -7,6 +7,13 @@ info:
 servers:
   - url: http://example.com/v1
 
+components:
+  securitySchemes:
+    authScheme:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
 paths:
   /auth/register:
     post:
@@ -70,13 +77,8 @@ paths:
   /route:
     post:
       summary: Поиск маршрута
-      parameters:
-        - name: Authorization
-          in: header
-          required: true
-          description: Токен авторизации пользователя
-          schema:
-            type: string
+      security:
+        - authScheme: []
       requestBody:
         required: true
         content:
@@ -93,7 +95,6 @@ paths:
                         type: integer
                     required:
                       - id
-                      - name
               required:
                 - points
       responses:
