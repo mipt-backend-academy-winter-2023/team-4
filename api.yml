@@ -14,6 +14,31 @@ components:
       scheme: bearer
       bearerFormat: JWT
 
+  schemas:
+    user:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Имя пользователя
+        password:
+          type: string
+          description: Пароль пользователя
+      required:
+        - username
+        - password
+
+    points:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            description: id точек
+        required:
+          - id
+
 paths:
   /auth/register:
     post:
@@ -23,15 +48,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                password:
-                  type: string
-              required:
-                - username
-                - password
+              $ref: '#/components/schemas/user'
       responses:
         '200':
           description: Пользователь успешно зарегистрирован
@@ -50,15 +67,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                password:
-                  type: string
-              required:
-                - username
-                - password
+              $ref: '#/components/schemas/user'
       responses:
         '200':
           description: Пользователь успешно аутентифицирован и получил токен авторизации
@@ -84,36 +93,15 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                points:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                    required:
-                      - id
-              required:
-                - points
+              $ref: '#/components/schemas/points'
       responses:
         '200':
           description: Маршрут успешно найден
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  route:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
+                $ref: '#/components/schemas/points'
         '400':
           description: Некорректный запрос. Пропущен обязательный параметр.
         '401':
           description: Необходимо авторизоваться для получения доступа к ресурсу
-
