@@ -1,0 +1,119 @@
+openapi: 3.0.0
+info:
+  title: Поиск маршрутов
+  description: API для сервисов авторизации и поиска маршрутов
+  version: 1.0.0
+
+servers:
+  - url: http://example.com/v1
+
+components:
+  securitySchemes:
+    authScheme:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+paths:
+  /auth/register:
+    post:
+      summary: Регистрация пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          description: Пользователь успешно зарегистрирован
+        '400':
+          description: Некорректный запрос. Пропущен обязательный параметр.
+        '409':
+          description: Пользователь с таким логином уже зарегистрирован
+        '500':
+          description: Ошибка сервера
+
+  /auth/login:
+    post:
+      summary: Аутентификация пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          description: Пользователь успешно аутентифицирован и получил токен авторизации
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '401':
+          description: Некорректные учетные данные
+        '500':
+          description: Ошибка сервера
+
+  /route:
+    post:
+      summary: Поиск маршрута
+      security:
+        - authScheme: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                points:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                    required:
+                      - id
+              required:
+                - points
+      responses:
+        '200':
+          description: Маршрут успешно найден
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  route:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+        '400':
+          description: Некорректный запрос. Пропущен обязательный параметр.
+        '401':
+          description: Необходимо авторизоваться для получения доступа к ресурсу
+
