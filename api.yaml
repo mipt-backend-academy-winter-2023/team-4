@@ -1,0 +1,174 @@
+openapi: 3.0.0
+ 
+info:
+  description: API for route search services
+  version: 0.0.1
+  title: Route Search API
+ 
+servers:
+  - url: http://localhost:8000/
+ 
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+ 
+paths:
+  /signup:
+    post:
+      tags:
+        - auth
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      token:
+                        type: string
+        "400":
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "409":
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+ 
+  /signin:
+    post:
+      tags:
+        - auth
+      summary: Authenticate a user and get an access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: User authenticated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      token:
+                        type: string
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+ 
+  /route:
+    get:
+      tags:
+        - routing
+      summary: Get a route based on given points
+      parameters:
+        - in: query
+          name: point_ids
+          schema:
+            type: array
+            items:
+              type: integer
+          required: true
+          description: IDs of points to build the route
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Route found successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    latitude:
+                      type: number
+                    longitude:
+                      type: number
+        "401":
+          description: Invalid access token
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
