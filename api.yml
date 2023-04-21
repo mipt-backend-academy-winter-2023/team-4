@@ -106,7 +106,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/points'
+              type: array
+              items:
+                type: string
       responses:
         '200':
           description: Маршрут успешно найден
