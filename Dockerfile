@@ -6,5 +6,5 @@ RUN sbt assembly
 
 FROM eclipse-temurin:17-jre-focal
 RUN mkdir -p /opt/app
-COPY --from=build /services/auth/target/scala-2.13/team-4-auth-assembly-0.1.0-SNAPSHOT.jar /opt/app/auth.jar
-COPY --from=build /services/routing/target/scala-2.13/team-4-routing-assembly-0.1.0-SNAPSHOT.jar /opt/app/routing.jar
+COPY --from=build /services/auth/target/*.jar /opt/app/auth.jar
+COPY --from=build /services/routing/target/*.jar /opt/app/routing.jar

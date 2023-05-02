@@ -30,11 +30,17 @@ lazy val template = (project in file("template"))
 lazy val auth = (project in file("auth"))
   .settings(
     name := "team-4-auth",
-    libraryDependencies ++= Auth.dependencies
+    libraryDependencies ++= Auth.dependencies,
+    assembly / mainClass := Some("auth.AuthMain"),
+    assembly / assemblyJarName := "auth.jar",
+    assembly / assemblyOutputPath := baseDirectory.value / "target" / (assembly / assemblyJarName).value
   )
 
 lazy val routing = (project in file("routing"))
   .settings(
     name := "team-4-routing",
-    libraryDependencies ++= Routing.dependencies
+    libraryDependencies ++= Routing.dependencies,
+    assembly / mainClass := Some("routing.RoutingMain"),
+    assembly / assemblyJarName := "routing.jar",
+    assembly / assemblyOutputPath := baseDirectory.value / "target" / (assembly / assemblyJarName).value
   )
