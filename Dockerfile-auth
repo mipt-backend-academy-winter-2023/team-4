@@ -7,4 +7,4 @@ RUN sbt "auth / assembly"
 FROM eclipse-temurin:19-jre-focal
 RUN mkdir -p /opt/app
 COPY --from=build /root/auth/target/*.jar /opt/app/auth.jar
-ENTRYPOINT ["java"]
+ENTRYPOINT ["java", "-jar", "/opt/app/auth.jar"]

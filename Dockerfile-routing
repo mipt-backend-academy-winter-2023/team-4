@@ -7,4 +7,4 @@ RUN sbt "routing / assembly"
 FROM eclipse-temurin:19-jre-focal
 RUN mkdir -p /opt/app
 COPY --from=build /root/routing/target/*.jar /opt/app/routing.jar
-ENTRYPOINT ["java"]
+ENTRYPOINT ["java", "-jar", "/opt/app/routing.jar"]
