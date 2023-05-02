@@ -32,6 +32,7 @@ lazy val auth = (project in file("auth"))
     name := "team-4-auth",
     assembly / mainClass := Some("auth.AuthMain"),
     assembly / assemblyJarName := "auth.jar",
+    assembly / assemblyOutputPath := baseDirectory.value / "target" / (assembly / assemblyJarName).value,
     libraryDependencies ++= Auth.dependencies
   )
 
@@ -40,5 +41,6 @@ lazy val routing = (project in file("routing"))
     name := "team-4-routing",
     assembly / mainClass := Some("routing.RoutingMain"),
     assembly / assemblyJarName := "routing.jar",
+    assembly / assemblyOutputPath := baseDirectory.value / "target" / (assembly / assemblyJarName).value,
     libraryDependencies ++= Routing.dependencies
   )
