@@ -6,5 +6,5 @@ RUN sbt assembly
 
 FROM eclipse-temurin:17-jre-focal
 RUN mkdir -p /opt/app
-COPY --from=build /services/auth/target/*.jar /opt/app/auth.jar
-COPY --from=build /services/routing/target/*.jar /opt/app/routing.jar
+COPY --from=build /services/auth/target/auth.jar /opt/app/auth.jar
+COPY --from=build /services/routing/target/routing.jar /opt/app/routing.jar
