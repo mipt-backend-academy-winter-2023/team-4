@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  auth:
+    build:
+      context: ./
+      dockerfile: Dockerfile-auth
+    ports:
+      - "8080:8081"
+  routing:
+    build:
+      context: ./
+      dockerfile: Dockerfile-routing
+    ports:
+      - "9090:8082"
