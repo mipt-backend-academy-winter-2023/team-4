@@ -5,10 +5,25 @@ ThisBuild / version := "0.1.0-SNAPSHOT"
 ThisBuild / scalaVersion := "2.13.10"
 
 ThisBuild / assemblyMergeStrategy := {
-  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
-  case x =>
-    val oldStrategy = (ThisBuild / assemblyMergeStrategy).value
-    oldStrategy(x)
+  case x if Assembly.isConfigFile(x) =>
+    MergeStrategy.concat
+  case PathList(ps @ _*) if Assembly.isReadme(ps.last) || Assembly.isLicenseFile(ps.last) =>
+    MergeStrategy.rename
+  case PathList("META-INF", xs @ _*) =>
+    xs map { _.toLowerCase } match {
+      case "manifest.mf" :: Nil | "index.list" :: Nil | "dependencies" :: Nil =>
+        MergeStrategy.discard
+      case ps @ x :: xs if ps.last.endsWith(".sf") || ps.last.endsWith(".dsa") =>
+        MergeStrategy.discard
+      case "plexus" :: xs =>
+        MergeStrategy.discard
+      case "services" :: xs =>
+        MergeStrategy.filterDistinctLines
+      case "spring.schemas" :: Nil | "spring.handlers" :: Nil =>
+        MergeStrategy.filterDistinctLines
+      case _ => MergeStrategy.first
+    }
+  case _ => MergeStrategy.first
 }
 
 lazy val root = (project in file("."))
@@ -30,17 +45,15 @@ lazy val template = (project in file("template"))
 lazy val auth = (project in file("auth"))
   .settings(
     name := "team-4-auth",
+    libraryDependencies ++= Auth.dependencies,
     assembly / mainClass := Some("auth.AuthMain"),
-    assembly / assemblyJarName := "auth.jar",
-    assembly / assemblyOutputPath := baseDirectory.value / "target" / (assembly / assemblyJarName).value,
-    libraryDependencies ++= Auth.dependencies
+    assembly / assemblyJarName := "auth.jar"
   )
 
 lazy val routing = (project in file("routing"))
   .settings(
     name := "team-4-routing",
+    libraryDependencies ++= Routing.dependencies,
     assembly / mainClass := Some("routing.RoutingMain"),
-    assembly / assemblyJarName := "routing.jar",
-    assembly / assemblyOutputPath := baseDirectory.value / "target" / (assembly / assemblyJarName).value,
-    libraryDependencies ++= Routing.dependencies
+    assembly / assemblyJarName := "routing.jar"
   )

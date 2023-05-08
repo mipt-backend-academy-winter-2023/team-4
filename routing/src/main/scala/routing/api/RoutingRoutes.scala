@@ -2,29 +2,16 @@ package routing.api
 
 import zio.ZIO
 import zio.http._
-import zio.http.model.{Method, Status}
+import zio.http.model.Method
 
 object RoutingRoutes {
 
-  val app: Http[Any, Response, Request, Response] = Http.collectZIO[Request] {
+  val app: Http[Any, Response, Request, Response] =
+    Http.collectZIO[Request] {
 
-    case Method.GET -> !! / "hello" =>
-      ZIO.succeed(Response.text("Hello world!"))
+      case Method.POST -> !! / "route" =>
+        ZIO.succeed(Response.json("""[{"id": 0}]"""))
 
-    case request @ Method.POST -> !! / "echo" =>
-      val response =
-        for {
-          input <- ZIO
-            .fromOption(
-              request.url.queryParams
-                .get("input")
-                .flatMap(_.headOption)
-            )
-            .tapError(_ => ZIO.logError("bad request"))
-        } yield Response.text(input)
-
-      response.orElseFail(Response.status(Status.BadRequest))
-
-  }
+    }
 
 }

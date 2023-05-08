@@ -1,15 +1,16 @@
-version: "3.8"
+version: "3.9"
 
 services:
   auth:
     build:
-      context: ./
-      dockerfile: Dockerfile-auth
+      context: .
+      dockerfile: ./DockerfileAuth
     ports:
-      - "8080:8081"
+      - "8080:8080"
+
   routing:
     build:
-      context: ./
-      dockerfile: Dockerfile-routing
+      context: .
+      dockerfile: ./DockerfileRouting
     ports:
-      - "9090:8082"
+      - "9090:8080"
