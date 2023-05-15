@@ -1,13 +1,13 @@
 package repo
 
-import model.Customer
+import model.User
 import zio.{ZIO, ZLayer}
 import zio.sql.ConnectionPool
 import zio.stream.ZStream
 
-final class CustomerRepositoryImpl(
+final class UserRepositoryImpl(
     pool: ConnectionPool
-) extends CustomerRepository
+) extends UserRepository
     with PostgresTableDescription {
 
   val driverLayer: ZLayer[Any, Nothing, SqlDriver] =
@@ -17,25 +17,25 @@ final class CustomerRepositoryImpl(
         ZLayer.succeed(pool)
       )
 
-  override def findAll(): ZStream[Any, Throwable, Customer] = {
+  override def findAll(): ZStream[Any, Throwable, User] = {
     val selectAll =
-      select(customerId, fName, lName).from(customers)
+      select(userId, login, passwordHash).from(users)
 
     ZStream.fromZIO(
       ZIO.logInfo(s"Query to execute findAll is ${renderRead(selectAll)}")
     ) *>
-      execute(selectAll.to((Customer.apply _).tupled))
+      execute(selectAll.to((User.apply _).tupled))
         .provideSomeLayer(driverLayer)
   }
 
-  override def add(customer: Customer): ZIO[Any, Throwable, Unit] = {
+  override def add(customer: User): ZIO[Any, Throwable, Unit] = {
     val query =
-      insertInto(customers)(customerId, fName, lName)
+      insertInto(users)(userId, login, passwordHash)
         .values(
           (
             customer.id,
-            customer.firstName,
-            customer.lastName
+            customer.login,
+            customer.pwdhash
           )
         )
 
@@ -46,14 +46,14 @@ final class CustomerRepositoryImpl(
   }
 
   override def updateCustomer(
-      customer: Customer
+      customer: User
   ): ZIO[Any, Throwable, Unit] = {
     val query =
-      update(customers)
-      .set(fName, customer.firstName)
-        .set(lName, customer.lastName)
-        .where(customerId === customer.id)
-        //.where(Expr.Relational(customerId, customer.id, RelationalOp.Equals))
+      update(users)
+        .set(login, customer.login)
+        .set(passwordHash, customer.pwdhash)
+        .where(userId === customer.id)
+    // .where(Expr.Relational(customerId, customer.id, RelationalOp.Equals))
 
     ZIO.logInfo(s"Query to update customer is ${renderUpdate(query)}") *>
       execute(query)
@@ -62,14 +62,14 @@ final class CustomerRepositoryImpl(
   }
 
   override def delete(id: Int): ZIO[Any, Throwable, Unit] = {
-    val delete = deleteFrom(customers).where(customerId === id)
+    val delete = deleteFrom(users).where(userId === id)
     execute(delete)
       .provideSomeLayer(driverLayer)
       .unit
   }
 }
 
-object CustomerRepositoryImpl {
-  val live: ZLayer[ConnectionPool, Throwable, CustomerRepository] =
-    ZLayer.fromFunction(new CustomerRepositoryImpl(_))
+object UserRepositoryImpl {
+  val live: ZLayer[ConnectionPool, Throwable, UserRepository] =
+    ZLayer.fromFunction(new UserRepositoryImpl(_))
 }

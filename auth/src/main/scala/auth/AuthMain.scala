@@ -3,7 +3,9 @@ package auth
 import auth.api.AuthRoutes
 import auth.config.ServiceConfig
 import flyway.FlywayAdapter
+import repo.{UserRepository, UserRepositoryImpl}
 import zio.http.Server
+import zio.sql.ConnectionPool
 import zio.{Scope, ZIO, ZIOAppArgs, ZIOAppDefault}
 
 object AuthMain extends ZIOAppDefault {
@@ -19,7 +21,10 @@ object AuthMain extends ZIOAppDefault {
       Server.live,
       ServiceConfig.live,
       ServiceConfig.dbLive,
-      FlywayAdapter.live
+      FlywayAdapter.live,
+      ServiceConfig.connectionPoolConfigLive,
+      ConnectionPool.live,
+      UserRepositoryImpl.live
     )
   }
 
