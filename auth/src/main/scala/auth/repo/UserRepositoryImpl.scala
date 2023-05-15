@@ -17,6 +17,15 @@ final class UserRepositoryImpl(pool: ConnectionPool) extends PostgresTableDescri
     getEncoder.encodeToString(bytes)
   }
 
+  private def checkUserByName(username: String): ZStream[Any, Throwable, User] = {
+    val selectUser = select(fUsername, fPassword)
+      .from(users)
+      .where(fUsername === username)
+    ZStream.fromZIO(
+      ZIO.logInfo(s"Query to execute checkUserByName is ${renderRead(selectUser)}")
+    ) *> execute(selectUser.to((User.apply _).tupled)).provideSomeLayer(driverLayer)
+  }
+
   override def findUser(user: User): ZStream[Any, Throwable, User] = {
     val selectUser = select(fUsername, fPassword)
       .from(users)
@@ -27,19 +36,26 @@ final class UserRepositoryImpl(pool: ConnectionPool) extends PostgresTableDescri
   }
 
   override def add(user: User): ZIO[UserRepository, Throwable, Unit] = {
-    val query =
-      insertInto(users)(fUsername, fPassword)
-        .values(
-          (
-            user.username,
-            encodePassword(user.password)
-          )
-        )
-
-    ZIO.logInfo(s"Query to insert user is ${renderInsert(query)}") *>
-      execute(query)
-        .provideSomeLayer(driverLayer)
-        .unit
+    checkUserByName(user.username).runCollect.map(_.toArray).either.flatMap {
+      case Right(arr) => arr match {
+        case Array() => {
+          val query =
+            insertInto(users)(fUsername, fPassword)
+              .values(
+                (
+                  user.username,
+                  encodePassword(user.password)
+                )
+              )
+          ZIO.logInfo(s"Query to insert user is ${renderInsert(query)}") *>
+            execute(query)
+              .provideSomeLayer(driverLayer)
+              .unit
+        }
+        case _ => ZIO.fail(new IllegalAccessException("User exists"))
+      }
+      case Left(_) => ZIO.fail(new Exception("Error"))
+    }
   }
 }
 

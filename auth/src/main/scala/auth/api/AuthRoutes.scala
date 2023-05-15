@@ -7,7 +7,7 @@ import io.circe.jawn.decode
 import zio.ZIO
 import zio.http._
 import zio.http.model.Method
-import zio.http.model.Status.{BadRequest, Created, Unauthorized}
+import zio.http.model.Status.{BadRequest, Conflict, Created, Unauthorized}
 import pdi.jwt.{Jwt, JwtAlgorithm, JwtClaim}
 
 import java.time.Clock
@@ -31,7 +31,11 @@ object AuthRoutes {
           _ <- ZIO.logInfo(s"Registered user: $user")
         } yield ()).either.map {
           case Right(_) => Response.status(Created)
-          case Left(_) => Response.status(BadRequest)
+          case Left(ex) =>
+            ex match {
+              case _: IllegalAccessException => Response.status(Conflict)
+              case _ => Response.status(BadRequest)
+            }
         }
 
       case req@Method.POST -> !! / "auth" / "login" =>
