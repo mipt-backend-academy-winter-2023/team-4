@@ -10,27 +10,17 @@ object AuthMain extends ZIOAppDefault {
 
   override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] = {
     val server = for {
-      _ <- ZIO.logInfo("Starting Auth service")
       flyway <- ZIO.service[FlywayAdapter.Service]
       _ <- flyway.migration
-      _ <- Server
-        .serve(AuthRoutes.app)
-        .provide(
-          Server.live,
-          ServiceConfig.live
-        )
-    } yield ()
-
-    ZIO.logInfo("Started")
+      server <- Server.serve(AuthRoutes.app)
+    } yield server
 
     server.provide(
-      ServiceConfig.dbLive,
-      FlywayAdapter.live,
       Server.live,
-      ServiceConfig.connectionPoolConfigLive
+      ServiceConfig.live,
+      ServiceConfig.dbLive,
+      FlywayAdapter.live
     )
-
-    ZIO.logInfo("Provided")
   }
 
 }

@@ -3,6 +3,9 @@
 .bsp/
 out/
 
+# Python
+__pycache__/
+
 # sbt
 target/
 project/project/
