@@ -21,6 +21,7 @@ class FlywayAdapterImpl(dbConfig: DbConfig) extends FlywayAdapter.Service {
       .succeed(
         Flyway
           .configure()
+          .locations("/migration")
           .dataSource(dbConfig.url, dbConfig.user, dbConfig.password)
       )
       .map(new Flyway(_))

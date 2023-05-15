@@ -5,6 +5,6 @@ CREATE TABLE "user"
     "pwdhash"  VARCHAR NOT NULL
 );
 
-INSERT INTO "customer" (first_name, last_name)
+INSERT INTO "user" (login, pwdhash)
 VALUES  ('login1', 'hshpwd1'),
         ('login2', 'hshpwd2');
