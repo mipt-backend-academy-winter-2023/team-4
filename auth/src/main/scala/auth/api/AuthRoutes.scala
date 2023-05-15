@@ -7,7 +7,7 @@ import io.circe.jawn.decode
 import zio.ZIO
 import zio.http._
 import zio.http.model.Method
-import zio.http.model.Status.{BadRequest, Created, Forbidden}
+import zio.http.model.Status.{BadRequest, Created, Unauthorized}
 import pdi.jwt.{Jwt, JwtAlgorithm, JwtClaim}
 
 import java.time.Clock
@@ -42,9 +42,9 @@ object AuthRoutes {
         } yield entry).either.map {
           case Right(users) =>
             users match {
-              case Array() => Response.status(Forbidden)
+              case Array() => Response.status(Unauthorized)
               case arr =>
-                ZIO.logInfo(s"Login ${arr.head}")
+                ZIO.logInfo(s"Login was successful for ${arr.head}")
                 Response.text(s"{\"token\": \"${generateJWT(arr.head.username)}\"}")
             }
           case Left(_) => Response.status(BadRequest)
