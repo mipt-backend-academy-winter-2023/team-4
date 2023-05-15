@@ -8,8 +8,17 @@ import zio.ZIO
 import zio.http._
 import zio.http.model.Method
 import zio.http.model.Status.{BadRequest, Created, Forbidden}
+import pdi.jwt.{Jwt, JwtAlgorithm, JwtClaim}
+
+import java.time.Clock
 
 object AuthRoutes {
+  private val salt = "493194919"
+
+  private def generateJWT(username: String): String = {
+    val claim = JwtClaim(subject = Some(username))
+    Jwt.encode(claim, salt, JwtAlgorithm.HS256)
+  }
 
   val app: HttpApp[UserRepository, Response] =
     Http.collectZIO[Request] {
@@ -29,14 +38,14 @@ object AuthRoutes {
         (for {
           bodyStr <- req.body.asString
           user <- ZIO.fromEither(decode[User](bodyStr)).tapError(e => ZIO.logError(e.getMessage))
-          allFound <- UserRepository.findUser(user).runCollect.map(_.toArray)
-        } yield allFound).either.map {
+          entry <- UserRepository.findUser(user).runCollect.map(_.toArray)
+        } yield entry).either.map {
           case Right(users) =>
             users match {
               case Array() => Response.status(Forbidden)
               case arr =>
                 ZIO.logInfo(s"Login ${arr.head}")
-                Response.text(s"{\"token\": \"${arr.head.username}\"}")
+                Response.text(s"{\"token\": \"${generateJWT(arr.head.username)}\"}")
             }
           case Left(_) => Response.status(BadRequest)
         }
