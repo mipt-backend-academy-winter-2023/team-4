@@ -21,12 +21,16 @@ object AuthMain extends ZIOAppDefault {
         )
     } yield ()
 
+    ZIO.logInfo("Started")
+
     server.provide(
       ServiceConfig.dbLive,
       FlywayAdapter.live,
       Server.live,
       ServiceConfig.connectionPoolConfigLive
     )
+
+    ZIO.logInfo("Provided")
   }
 
 }

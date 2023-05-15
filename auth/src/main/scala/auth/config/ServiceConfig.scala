@@ -10,11 +10,13 @@ import zio.sql.ConnectionPoolConfig
 import java.util.Properties
 
 final case class ServiceConfig(host: String, port: Int)
+final case class DbConfig(url: String, user: String, password: String)
 
 object ServiceConfig {
 
-  private val source: ConfigSource = ConfigSource.default.at("app").at("service-config")
-  private val appConfig: ServiceConfig = source.loadOrThrow[ServiceConfig]
+  private val source: ConfigSource = ConfigSource.default.at("app")
+  private val appConfig: ServiceConfig = source.at("service-config").loadOrThrow[ServiceConfig]
+  private val dbConfig: DbConfig = source.at("db-config").loadOrThrow[DbConfig]
 
   val live: ZLayer[Any, Nothing, ServerConfig] = ServerConfig.live {
     ServerConfig.default
@@ -25,14 +27,12 @@ object ServiceConfig {
   }
 
   val dbLive: ULayer[DbConfig] = {
-    import ConfigImpl._
     ZLayer.fromZIO(
-      ZIO.attempt(source.loadOrThrow[ConfigImpl].dbConfig).orDie
+      ZIO.attempt(dbConfig).orDie
     )
   }
 
-  val connectionPoolConfigLive
-  : ZLayer[DbConfig, Throwable, ConnectionPoolConfig] =
+  val connectionPoolConfigLive: ZLayer[DbConfig, Throwable, ConnectionPoolConfig] =
     ZLayer(
       for {
         serverConfig <- ZIO.service[DbConfig]
@@ -49,26 +49,4 @@ object ServiceConfig {
     props
   }
 
-}
-
-case class ConfigImpl(
-                       dbConfig: DbConfig,
-                       httpServiceConfig: HttpServerConfig
-                     )
-case class DbConfig(
-                     url: String,
-                     user: String,
-                     password: String
-                   )
-case class HttpServerConfig(
-                             host: String,
-                             port: Int
-                           )
-
-object ConfigImpl {
-  implicit val configReader: ConfigReader[ConfigImpl] = deriveReader[ConfigImpl]
-  implicit val configReaderHttpServerConfig: ConfigReader[HttpServerConfig] =
-    deriveReader[HttpServerConfig]
-  implicit val configReaderDbConfig: ConfigReader[DbConfig] =
-    deriveReader[DbConfig]
 }
