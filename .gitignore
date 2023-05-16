@@ -14,6 +14,3 @@ project/target/
 
 # MacOS
 .DS_Store
-
-# Misc
-*.env

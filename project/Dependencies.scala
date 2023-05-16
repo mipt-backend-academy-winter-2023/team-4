@@ -19,7 +19,8 @@ object Dependencies {
       zio,
       pureconfig,
       flyway,
-      circe
+      circe,
+      jwt
     ).flatten
   }
 

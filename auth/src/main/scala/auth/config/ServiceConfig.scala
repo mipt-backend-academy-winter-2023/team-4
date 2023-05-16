@@ -5,7 +5,7 @@ import pureconfig.generic.auto.exportReader
 import zio.ZLayer
 import zio.http.ServerConfig
 
-final case class ServiceConfig(host: String, port: Int)
+case class ServiceConfig(host: String, port: Int)
 
 object ServiceConfig {
 

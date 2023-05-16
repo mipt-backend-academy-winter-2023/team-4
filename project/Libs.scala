@@ -12,6 +12,8 @@ object Libs {
     val flyway = "9.17.0"
 
     val circe = "0.14.5"
+
+    val jwt = "9.2.0"
   }
 
   val zio: Seq[ModuleID] = Seq(
@@ -34,4 +36,7 @@ object Libs {
     "io.circe" %% "circe-parser" % V.circe
   )
 
+  val jwt: Seq[ModuleID] = Seq(
+    "com.github.jwt-scala" %% "jwt-json4s-native" % V.jwt
+  )
 }
