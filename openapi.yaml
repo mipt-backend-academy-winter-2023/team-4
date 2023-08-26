@@ -1,0 +1,167 @@
+openapi: 3.0.3
+info:
+  title: Route Search Service
+  description: Route search service OpenAPI specification
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8000/
+
+tags:
+  - name: Authorization
+
+  - name: Routing
+    description: Search for routes
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+  schemas:
+    auth:
+      type: object
+      properties:
+        user:
+          type: string
+          example: username
+        pass:
+          type: string
+          example: password
+    token:
+      type: object
+      properties:
+        token:
+          type: string
+    list_of_route_point_ids:
+      type: array
+      items:
+        properties:
+          point_id:
+            type: integer
+    list_of_route_points:
+      type: array
+      items:
+        properties:
+          point:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+    success_response:
+      type: object
+      properties:
+        message:
+          type: string
+    error_response:
+      type: object
+      properties:
+        error_message:
+          type: string
+
+paths:
+  /auth/signup:
+    post:
+      summary: Login and password authorization
+      tags: 
+      - Authorization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/auth'
+      responses:
+          "200":
+            description: Successful authorization
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/success_response'
+                  
+          "400":
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/error_response'
+          "500":
+            description: Server error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/error_response'
+
+  /auth/signin:
+    post:
+      summary: Login and password registration
+      tags: 
+      - Authorization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/auth'
+      responses:
+          "200":
+            description: Successful registration
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/token'
+          "400":
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/error_response'
+          "500":
+            description: Server error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/error_response'
+                  
+  /route:
+    post:
+      summary: Get a route
+      tags: 
+      - Routing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/list_of_route_point_ids'
+      security:
+      - BearerAuth: []
+      responses:
+          "200":
+            description: Successful request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/list_of_route_points'
+          "401":
+            description: Invalid access token
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/error_response'
+          "404":
+            description: Some of the requested points were not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/error_response'
+          "500":
+            description: Server error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/error_response'
