@@ -5,14 +5,14 @@ import zio.ZIO
 import zio.stream.ZStream
 
 trait VertexRepository {
-  def findAll(): ZStream[VertexRepository, Throwable, Vertex]
+  def getAll(): ZStream[VertexRepository, Throwable, Vertex]
 
   def add(vertex: Vertex): ZIO[VertexRepository, Throwable, Unit]
 }
 
 object VertexRepository {
-  def findAll(): ZStream[VertexRepository, Throwable, Vertex] =
-    ZStream.serviceWithStream[VertexRepository](_.findAll())
+  def getAll(): ZStream[VertexRepository, Throwable, Vertex] =
+    ZStream.serviceWithStream[VertexRepository](_.getAll())
 
   def add(vertex: Vertex): ZIO[VertexRepository, Throwable, Unit] =
     ZIO.serviceWithZIO[VertexRepository](_.add(vertex))
