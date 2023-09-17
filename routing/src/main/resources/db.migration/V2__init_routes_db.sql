@@ -1,9 +1,13 @@
-CREATE TABLE "cities"
+CREATE TABLE "vertexes"
 (
     id INT NOT NULL AUTO_INCREMENT,
-    city_name VARCHAR NOT NULL,
+    address VARCHAR NOT NULL,
     PRIMARY KEY (id)
 );
 
-INSERT INTO "cities" (city_name) VALUES ('Moscow');
-
+CREATE TABLE "edges"
+(
+    id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR NOT NULL,
+    PRIMARY KEY (id)
+);
