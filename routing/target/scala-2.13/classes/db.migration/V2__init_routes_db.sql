@@ -1,0 +1,13 @@
+CREATE TABLE "vertexes"
+(
+    id INT NOT NULL AUTO_INCREMENT,
+    address VARCHAR NOT NULL,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE "edges"
+(
+    id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR NOT NULL,
+    PRIMARY KEY (id)
+);

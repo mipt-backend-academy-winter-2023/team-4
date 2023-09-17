@@ -2,7 +2,7 @@ package routing
 
 import routing.api.RoutingRoutes
 import routing.config.ServiceConfig
-import routing.repo.UserRepositoryImpl
+import routing.repo.VertexRepositoryImpl
 import zio.http.Server
 import zio.{Scope, ZIO, ZIOAppArgs, ZIOAppDefault}
 import config.Config
@@ -26,7 +26,7 @@ object RoutingMain extends ZIOAppDefault {
       FlywayAdapter.live,
       Config.connectionPoolLive,
       ConnectionPool.live,
-      UserRepositoryImpl.live
+      VertexRepositoryImpl.live
     )
   }
 
