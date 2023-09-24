@@ -10,6 +10,15 @@ services:
     volumes:
       - database-data:/var/lib/postgresql/data/
 
+  city-data:
+    image: "postgres"
+    env_file:
+      - ./database.env
+    ports:
+      - "6432:5432"
+    volumes:
+      - city-data:/var/lib/postgresql/data/
+
   auth:
     build:
       context: .
@@ -28,3 +37,4 @@ services:
 
 volumes:
   database-data:
+  city-data:
