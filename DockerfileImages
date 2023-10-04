@@ -1,9 +1,9 @@
 FROM openjdk:11
 
-ENV jarname='auth.jar'
+ENV jarname='images.jar'
 
 WORKDIR /app
-COPY auth/target/scala-2.13/$jarname ./
+COPY images/target/scala-2.13/$jarname ./
 
 EXPOSE 8080
 
