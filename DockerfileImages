@@ -1,0 +1,10 @@
+FROM openjdk:11
+
+ENV jarname='auth.jar'
+
+WORKDIR /app
+COPY auth/target/scala-2.13/$jarname ./
+
+EXPOSE 8080
+
+ENTRYPOINT ["sh", "-c", "java -jar ${jarname}"]

@@ -26,5 +26,12 @@ services:
     ports:
       - "9090:8080"
 
+  images:
+    build:
+      context: .
+      dockerfile: ./DockerfileImages
+    ports:
+      - "7070:8080"
+
 volumes:
   database-data:

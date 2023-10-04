@@ -14,3 +14,6 @@ project/target/
 
 # MacOS
 .DS_Store
+
+# resources
+images/resources
