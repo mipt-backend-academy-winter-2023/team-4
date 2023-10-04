@@ -31,4 +31,13 @@ object Dependencies {
     ).flatten
   }
 
+  object Photos extends Dependencies {
+    override def dependencies: Seq[ModuleID] = Seq(
+      zio,
+      pureconfig,
+      circe,
+      jwt
+    ).flatten
+  }
+
 }
