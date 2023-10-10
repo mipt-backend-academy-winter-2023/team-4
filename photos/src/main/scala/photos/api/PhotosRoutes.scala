@@ -7,20 +7,25 @@ import zio.http.model.Method
 import zio.http.model.Status
 import zio.stream.{ZSink, ZStream, ZPipeline}
 import java.nio.file.{Files, Paths}
+import photos.utils.JpegValidation
 
 object PhotosRoutes {
 
     def getPath(id: String) = Paths.get(s"/${id}_image.png")
+    private val kMaxSize: Int = 10 * 1024 * 1024
 
     val app: HttpApp[Any, Response] = 
         Http.collectZIO[Request] {
             case req@Method.PUT -> !! / "photo" / id => 
                 (for {
                     path <- ZIO.attempt(Files.createFile(getPath(id)))
-                    size <- req.body.asStream.via(ZPipeline.deflate()).run(ZSink.fromPath(path))
+                    _ <- req.body.asStream.via(JpegValidation.pipeline).run(ZSink.drain)
+                    size <- req.body.asStream.run(ZSink.fromPath(path))
                 } yield size).either.map {
-                    case Left(_) => Response.status(Status.BadRequest)
-                    case Right(_) => Response.status(Status.Ok)
+                    case Right(size) if size <= kMaxSize => Response.status(Status.Ok)
+                    case _ => 
+                        Files.deleteIfExists(getPath(id))
+                        Response.status(Status.BadRequest)
                 }
             
             case req@Method.GET -> !! / "photo" / id =>
