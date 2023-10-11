@@ -10,19 +10,20 @@ import java.nio.file
 import java.nio.file.{Files, Paths}
 
 object ImagesRoutes {
+  private val fileSizeMb = 10 * 1000 * 1000
   private def getImagesDir: file.Path = {
     Paths.get(".", "images/resources/images")
   }
 
-  private def getImagesFilePath(place_id: String): file.Path = {
-    getImagesDir.resolve(place_id + ".jpeg")
+  private def getImagesFilePath(placeId: String): file.Path = {
+    getImagesDir.resolve(placeId + ".jpeg")
   }
 
   val app: HttpApp[Any, Nothing] =
     Http.collectZIO[Request] {
 
-      case Method.GET -> !! / "images" / place_id =>
-        val filePath = getImagesFilePath(place_id)
+      case Method.GET -> !! / "images" / placeId =>
+        val filePath = getImagesFilePath(placeId)
         if (Files.exists(filePath)) {
             ZIO.succeed(
               Response(
@@ -36,11 +37,11 @@ object ImagesRoutes {
         } else {
           ZIO.succeed(Response.status(Status.NotFound))
         }
-      case request@Method.POST -> !! / "images" / place_id =>
+      case request@Method.POST -> !! / "images" / placeId =>
         val dirPath = getImagesDir
         if (!Files.exists(dirPath))
           Files.createDirectories(dirPath)
-        val filePath = getImagesFilePath(place_id)
+        val filePath = getImagesFilePath(placeId)
         if (Files.exists(filePath)) {
           ZIO.succeed(Response.status(Status.BadRequest))
         } else {
@@ -56,9 +57,9 @@ object ImagesRoutes {
             case Left(e) =>
               Response(
                 status = Status.InternalServerError,
-                body = Body.fromString(e.toString)
+                body = Body.fromString(e.getMessage)
               )
-            case Right(bytesCount) if bytesCount >= 10000000 =>
+            case Right(bytesCount) if bytesCount >= fileSizeMb =>
               Response(Status.BadRequest)
             case Right(bytesCount) =>
               println(bytesCount.toString)

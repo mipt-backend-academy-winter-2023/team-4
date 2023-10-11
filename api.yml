@@ -124,13 +124,13 @@ paths:
         '401':
           description: Необходимо авторизоваться для получения доступа к ресурсу
 
-  /images/{place_id}:
+  /images/{place-id}:
     get:
       summary: Загрузка фото
       tags:
         - Images
       parameters:
-        - name: place_id
+        - name: place-id
           in: path
           required: true
           description: id дома или перекрёстка
@@ -147,7 +147,7 @@ paths:
         - Images
       parameters:
         - in: path
-          name: place_id
+          name: place-id
           schema:
             type: string
           required: true
