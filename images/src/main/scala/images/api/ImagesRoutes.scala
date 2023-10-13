@@ -1,5 +1,6 @@
 package images.api
 
+import images.helpers.JpegValidation
 import zio._
 import zio.ZIO
 import zio.http._
@@ -7,7 +8,7 @@ import zio.http.model.{Header, Method, Status}
 import zio.stream.{ZSink, ZStream}
 
 import java.nio.file.{Files, Paths, Path => JPath}
-import images.helpers.{AuthHelper, ErrorWithResponse}
+import images.helpers.{AuthHelper, ErrorWithResponse, JpegValidation}
 
 object ImagesRoutes {
   val app: HttpApp[Any, Nothing] =
@@ -27,7 +28,9 @@ object ImagesRoutes {
             } catch {
               case _: Throwable => throw ErrorWithResponse(Response.status(Status.Conflict))
             }
-          request.body.asStream.take(Math.min(contentLength, kMaxSize)).run(
+          request.body.asStream.via(JpegValidation.pipeline).take(
+            Math.min(contentLength, kMaxSize)
+          ).run(
             ZSink.fromPath(path)
           ).catchAll(_ =>
             throw ErrorWithResponse(Response.status(Status.Conflict))
