@@ -14,6 +14,7 @@ object Libs {
     val circe = "0.14.5"
 
     val jwt = "9.2.0"
+    val jjwt = "0.9.1"
   }
 
   val zio: Seq[ModuleID] = Seq(
@@ -38,5 +39,12 @@ object Libs {
 
   val jwt: Seq[ModuleID] = Seq(
     "com.github.jwt-scala" %% "jwt-json4s-native" % V.jwt
+  )
+
+  val jjwt: Seq[ModuleID] = Seq(
+    "io.jsonwebtoken" % "jjwt" % "0.9.1",
+    "io.jsonwebtoken" % "jjwt-api" % "0.11.2",
+    "io.jsonwebtoken" % "jjwt-impl" % "0.11.2" % "runtime",
+    "io.jsonwebtoken" % "jjwt-orgjson" % "0.11.2" % "runtime"
   )
 }
