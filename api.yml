@@ -14,6 +14,9 @@ tags:
   - name: Routing
     description: Сервис поиска маршрута
 
+  - name: Photos
+    description: Сервис работы с фотографиями
+
 components:
   securitySchemes:
     authScheme:
@@ -120,3 +123,59 @@ paths:
           description: Некорректный запрос. Пропущен обязательный параметр.
         '401':
           description: Необходимо авторизоваться для получения доступа к ресурсу
+
+  /photo/{id}:
+    post:
+      summary: Загрузка фотографии
+      tags:
+        - Photos
+      security:
+        - authScheme: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id точки
+
+      requestBody:
+        required: true
+        content:
+          image/png:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '200':
+          description: Фотография успешно загружена
+        '400':
+          description: Некорректный запрос. Пропущен обязательный параметр.
+        '401':
+          description: Необходимо авторизоваться для получения доступа к ресурсу
+        '500':
+          description: Ошибка сервера
+
+    get:
+      summary: Получение фотографии
+      tags: 
+        - Photos
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id точки
+      responses:
+        '200':
+          description: Фотография успешно получена
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Некорректный запрос. Пропущен обязательный параметр.
+        '404':
+          description: Фотография не найдена

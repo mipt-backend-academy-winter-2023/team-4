@@ -2,11 +2,16 @@
 .idea/
 .bsp/
 out/
+.bloop/
+.metals/
+.vscode/
 
 # sbt
 target/
 project/project/
 project/target/
+project/.bloop/
+project/metals*
 
 # Scala
 *.class
