@@ -7,6 +7,7 @@ class PhotosApiTest extends AnyFlatSpec with Matchers {
 
   implicit val backend: SttpBackend[Identity, Any] = HttpURLConnectionBackend()
 
+  // URLs
   val testUri = uri"http://localhost:7070/photo/testId"
   val invalidUri = uri"http://localhost:7070/photo/invalidId"
 
