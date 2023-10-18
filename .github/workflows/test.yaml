@@ -1,0 +1,53 @@
+name: Test Backend and Photos API
+
+on:
+  push:
+    branches:
+      - main
+      - release/**
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install docker-compose
+
+      - name: Start backend and photos service
+        run: docker-compose up -d
+
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+
+      - name: Set up SBT
+        run: |
+          echo "cs bootstrap sbt-launcher --jvm 11 --main-class sbt.Console -- -sbt-create" > ./sbt 
+          chmod +x ./sbt
+          echo "$(pwd)" >> $GITHUB_PATH
+
+      - name: Cache SBT dependencies
+        uses: actions/cache@v2.1.4
+        with:
+          path: |
+            ~/.ivy2/cache
+            ~/.sbt
+            ~/.cache/coursier
+            ~/.m2/repository
+          key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt', '**/*.sbt') }}
+
+      - name: Check code formatting with Scalafmt
+        run: sbt scalafmtCheck
+
+      - name: Run tests
+        run: sbt test
+
+      - name: Stop and remove Docker containers
+        run: docker-compose down
