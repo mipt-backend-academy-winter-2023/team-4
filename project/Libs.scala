@@ -39,4 +39,10 @@ object Libs {
   val jwt: Seq[ModuleID] = Seq(
     "com.github.jwt-scala" %% "jwt-json4s-native" % V.jwt
   )
+
+  val test: Seq[ModuleID] = Seq(
+    "com.softwaremill.sttp.client3" %% "core" % "3.2.0",
+    "org.scalatest" %% "scalatest" % "3.2.5" % Test
+  )
+
 }

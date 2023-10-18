@@ -125,7 +125,7 @@ paths:
           description: Необходимо авторизоваться для получения доступа к ресурсу
 
   /photo/{id}:
-    post:
+    put:
       summary: Загрузка фотографии
       tags:
         - Photos
