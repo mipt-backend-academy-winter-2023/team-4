@@ -1,4 +1,4 @@
-name: Test Backend and Photos API
+name: Test Backend
 
 on:
   push:
@@ -18,6 +18,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get -y install docker-compose
+
+      - name: Compile service
+        run: sbt assembly
 
       - name: Start backend and photos service
         run: docker-compose up -d
