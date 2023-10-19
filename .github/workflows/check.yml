@@ -7,7 +7,7 @@ on:
       - alekseev/** # delete
 
 jobs:
-  build:
+  check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -27,6 +27,12 @@ jobs:
 
       - name: Start container
         run: docker-compose up -d
+
+      - name: Cache SBT dependencies
+        uses: actions/cache@v2
+        with:
+          path: "~/.sbt"
+          key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
 
       - name: Run tests
         run: sbt test
