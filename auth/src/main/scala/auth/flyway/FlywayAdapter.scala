@@ -9,7 +9,8 @@ object FlywayAdapter {
     def migration: UIO[Unit]
   }
 
-  val live: ZLayer[DbConfig, Nothing, FlywayAdapterImpl] = ZLayer.fromFunction(new FlywayAdapterImpl(_))
+  val live: ZLayer[DbConfig, Nothing, FlywayAdapterImpl] =
+    ZLayer.fromFunction(new FlywayAdapterImpl(_))
 }
 
 class FlywayAdapterImpl(dbConfig: DbConfig) extends FlywayAdapter.Service {

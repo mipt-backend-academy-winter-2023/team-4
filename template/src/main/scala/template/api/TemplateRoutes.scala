@@ -12,7 +12,7 @@ object TemplateRoutes {
       case Method.GET -> !! / "hello" =>
         ZIO.succeed(Response.text("Hello world!"))
 
-      case request@Method.POST -> !! / "echo" =>
+      case request @ Method.POST -> !! / "echo" =>
         val response =
           for {
             input <- ZIO.fromOption(
@@ -21,9 +21,7 @@ object TemplateRoutes {
                 .queryParams
                 .get("input")
                 .flatMap(_.headOption)
-            ).tapError(
-              _ => ZIO.logError("bad request")
-            )
+            ).tapError(_ => ZIO.logError("bad request"))
           } yield Response.text(input)
 
         response.orElseFail(Response.status(Status.BadRequest))

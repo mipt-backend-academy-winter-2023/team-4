@@ -26,7 +26,7 @@ object JpegValidation {
           aux(data)
         } else if (data.take(JpegHeader.length) == JpegHeader) {
           ZChannel.write(data) *> [Any, Nothing, Chunk[Byte], Any, Error, Chunk[Byte],
-            Any] ZChannel.identity[Nothing, Chunk[Byte], Any]
+          Any] ZChannel.identity[Nothing, Chunk[Byte], Any]
         } else {
           ZChannel.fail(Error.Invalid)
         }

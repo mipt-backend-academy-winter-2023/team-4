@@ -7,7 +7,8 @@ import zio.stream.ZStream
 import java.security.MessageDigest
 import java.util.Base64.getEncoder
 
-final class UserRepositoryImpl(pool: ConnectionPool) extends PostgresTableDescription with UserRepository {
+final class UserRepositoryImpl(pool: ConnectionPool) extends PostgresTableDescription
+    with UserRepository {
   val driverLayer: ZLayer[Any, Nothing, SqlDriver] =
     ZLayer.make[SqlDriver](SqlDriver.live, ZLayer.succeed(pool))
 
@@ -38,27 +39,28 @@ final class UserRepositoryImpl(pool: ConnectionPool) extends PostgresTableDescri
   override def add(user: User): ZIO[UserRepository, Throwable, Unit] = {
     checkUserByName(user.username).runCollect.map(_.toArray).either.flatMap {
       case Right(arr) => arr match {
-        case Array() => {
-          val query =
-            insertInto(users)(fUsername, fPassword)
-              .values(
-                (
-                  user.username,
-                  encodePassword(user.password)
+          case Array() => {
+            val query =
+              insertInto(users)(fUsername, fPassword)
+                .values(
+                  (
+                    user.username,
+                    encodePassword(user.password)
+                  )
                 )
-              )
-          ZIO.logInfo(s"Query to insert user is ${renderInsert(query)}") *>
-            execute(query)
-              .provideSomeLayer(driverLayer)
-              .unit
+            ZIO.logInfo(s"Query to insert user is ${renderInsert(query)}") *>
+              execute(query)
+                .provideSomeLayer(driverLayer)
+                .unit
+          }
+          case _ => ZIO.fail(new IllegalAccessException("User exists"))
         }
-        case _ => ZIO.fail(new IllegalAccessException("User exists"))
-      }
       case Left(_) => ZIO.fail(new Exception("Error"))
     }
   }
 }
 
 object UserRepositoryImpl {
-  val live: ZLayer[ConnectionPool, Throwable, UserRepository] = ZLayer.fromFunction(new UserRepositoryImpl(_))
+  val live: ZLayer[ConnectionPool, Throwable, UserRepository] =
+    ZLayer.fromFunction(new UserRepositoryImpl(_))
 }
