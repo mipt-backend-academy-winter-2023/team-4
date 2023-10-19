@@ -7,7 +7,7 @@ on:
       - alekseev/** # delete
 
 jobs:
-  tests:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -24,6 +24,9 @@ jobs:
 
       - name: Check code-format
         run: sbt scalafmtCheckAll
+
+      - name: Start container
+        run: docker-compose up -d
 
       - name: Run tests
         run: sbt test
