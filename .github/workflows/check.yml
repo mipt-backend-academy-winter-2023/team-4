@@ -19,6 +19,12 @@ jobs:
           sudo apt-get clean &&
           sudo rm -rf /var/lib/apt/lists/*
 
+      - name: Cache SBT dependencies
+        uses: actions/cache@v2
+        with:
+          path: "~/.sbt"
+          key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
+
       - name: Assembly app
         run: sbt assembly
 
@@ -27,12 +33,6 @@ jobs:
 
       - name: Start container
         run: docker-compose up -d
-
-      - name: Cache SBT dependencies
-        uses: actions/cache@v2
-        with:
-          path: "~/.sbt"
-          key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
 
       - name: Run tests
         run: sbt test
