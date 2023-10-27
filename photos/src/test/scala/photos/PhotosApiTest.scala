@@ -21,7 +21,7 @@ class PhotosApiTest extends AnyFlatSpec with Matchers {
     response.code shouldBe StatusCode.Ok
   }
 
-  "Uploading a photo" should "return 400 for not jpeg" in {
+  it should "return 400 for not jpeg" in {
     val testRequest = basicRequest
       .body(Array[Byte](1, 2, 3, 4))
       .contentType(MediaType.ImagePng)
@@ -39,7 +39,7 @@ class PhotosApiTest extends AnyFlatSpec with Matchers {
     response.body.isRight shouldBe true
   }
 
-  "Downloading a photo" should "return 404 and photo for an invalid id" in {
+  it should "return 404 and photo for an invalid id" in {
     val testRequest = basicRequest.get(invalidUri)
 
     val response = testRequest.send(backend)
