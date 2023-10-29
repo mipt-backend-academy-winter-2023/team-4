@@ -17,7 +17,7 @@ class PhotosTest extends AnyFlatSpec with Matchers {
   )
   implicit val backend: SyncBackend = HttpURLConnectionBackend()
 
-  "Uploading of small photo" should "return ok" in {
+  it should "Uploading of small photo" in {
     val request = basicRequest
       .body(msgJPEG)
       .contentType("image/jpeg")
@@ -26,7 +26,7 @@ class PhotosTest extends AnyFlatSpec with Matchers {
     response.code shouldBe StatusCode.Ok
   }
 
-  "Get of existed photo" should "return ok and photo" in {
+  it should "Get of existed photo" in {
     val request = basicRequest
       .get(uri"http://localhost:7070/photo/1")
     val response = request.send(backend)
@@ -34,7 +34,7 @@ class PhotosTest extends AnyFlatSpec with Matchers {
     response.body.isRight shouldBe true
   }
 
-  "Long message should be rejected" should "return bad request" in {
+  it should "Long message should be rejected" in {
     val longMsg = msgJPEG ++ Array.fill[Byte](10 * 1024 * 1024)(0)
     val request = basicRequest
       .body(longMsg)
@@ -44,7 +44,7 @@ class PhotosTest extends AnyFlatSpec with Matchers {
     response.code shouldBe StatusCode.PayloadTooLarge
   }
 
-  "Just random bytes should be rejected" should "return bad request" in {
+  it should "Just random bytes should be rejected" in {
     val request = basicRequest
       .body(Array.fill[Byte](1024)(0))
       .contentType("image/jpeg")
@@ -53,7 +53,7 @@ class PhotosTest extends AnyFlatSpec with Matchers {
     response.code shouldBe StatusCode.BadRequest
   }
 
-  "Get of not existed photo" should "return not found" in {
+  it should "Get of not existed photo" in {
     val request = basicRequest
       .get(uri"http://localhost:7070/photo/4")
     val response = request.send(backend)
