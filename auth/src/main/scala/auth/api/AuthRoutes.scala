@@ -23,7 +23,7 @@ object AuthRoutes {
   val app: HttpApp[UserRepository, Response] =
     Http.collectZIO[Request] {
 
-      case req@Method.POST -> !! / "auth" / "register" =>
+      case req @ Method.POST -> !! / "auth" / "register" =>
         (for {
           bodyStr <- req.body.asString
           user <- ZIO.fromEither(decode[User](bodyStr)).tapError(e => ZIO.logError(e.getMessage))
@@ -34,11 +34,11 @@ object AuthRoutes {
           case Left(ex) =>
             ex match {
               case _: IllegalAccessException => Response.status(Conflict)
-              case _ => Response.status(BadRequest)
+              case _                         => Response.status(BadRequest)
             }
         }
 
-      case req@Method.POST -> !! / "auth" / "login" =>
+      case req @ Method.POST -> !! / "auth" / "login" =>
         (for {
           bodyStr <- req.body.asString
           user <- ZIO.fromEither(decode[User](bodyStr)).tapError(e => ZIO.logError(e.getMessage))

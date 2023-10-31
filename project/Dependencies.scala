@@ -36,7 +36,8 @@ object Dependencies {
       zio,
       pureconfig,
       circe,
-      jwt
+      jwt,
+      test
     ).flatten
   }
 

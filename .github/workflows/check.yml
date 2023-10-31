@@ -1,0 +1,37 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+      - release/**
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install docker-compose
+        run: |
+          sudo apt-get update &&
+          sudo apt-get install -y docker-compose &&
+          sudo apt-get clean &&
+          sudo rm -rf /var/lib/apt/lists/*
+
+      - name: Cache SBT dependencies
+        uses: actions/cache@v2
+        with:
+          path: "~/.sbt"
+          key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
+
+      - name: Assembly app
+        run: sbt assembly
+
+      - name: Check code-format
+        run: sbt scalafmtCheckAll
+
+      - name: Start container
+        run: docker-compose up -d
+
+      - name: Run tests
+        run: sbt test
