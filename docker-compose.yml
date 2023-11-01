@@ -30,6 +30,8 @@ services:
     image: nginx
     ports:
       - "7070:80"
+    volumes:
+      - "./nginx.conf:/etc/nginx/nginx.conf"
 
   photos1:
     build:
@@ -37,8 +39,6 @@ services:
       dockerfile: ./DockerfilePhoto
     ports:
       - "7071:8080"
-    volumes:
-      - "./nginx.conf:/etc/nginx/nginx.conf"
 
   photos2:
     build:
