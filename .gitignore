@@ -19,3 +19,6 @@ project/metals*
 
 # MacOS
 .DS_Store
+
+# directory with photos
+photos/src/main/resources/photos

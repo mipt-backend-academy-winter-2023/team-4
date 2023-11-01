@@ -39,6 +39,8 @@ services:
       dockerfile: ./DockerfilePhoto
     ports:
       - "7071:8080"
+    volumes:
+      - ./photos/src/main/resources/photos:/photos
 
   photos2:
     build:
@@ -46,6 +48,8 @@ services:
       dockerfile: ./DockerfilePhoto
     ports:
       - "7072:8080"
+    volumes:
+      - ./photos/src/main/resources/photos:/photos
 
   photos3:
     build:
@@ -53,6 +57,8 @@ services:
       dockerfile: ./DockerfilePhoto
     ports:
       - "7073:8080"
+    volumes:
+      - ./photos/src/main/resources/photos:/photos
 
 volumes:
   database-data:
