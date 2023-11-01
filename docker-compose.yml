@@ -26,12 +26,33 @@ services:
     ports:
       - "9090:8080"
 
-  photos:
+  balancer:
+    image: nginx
+    ports:
+      - "7070:80"
+
+  photos1:
     build:
       context: .
       dockerfile: ./DockerfilePhoto
     ports:
-      - "7070:8080"
+      - "7071:8080"
+    volumes:
+      - "./nginx.conf:/etc/nginx/nginx.conf"
+
+  photos2:
+    build:
+      context: .
+      dockerfile: ./DockerfilePhoto
+    ports:
+      - "7072:8080"
+
+  photos3:
+    build:
+      context: .
+      dockerfile: ./DockerfilePhoto
+    ports:
+      - "7073:8080"
 
 volumes:
   database-data:
