@@ -11,13 +11,14 @@ import photos.utils.JpegValidation
 
 object PhotosRoutes {
 
-  def getPath(id: String) = Paths.get(s"/${id}_image.png")
+  def getPath(id: String) = Paths.get(s"/photos/${id}_image.png")
   private val kMaxSize: Int = 10 * 1024 * 1024
 
   val app: HttpApp[Any, Response] =
     Http.collectZIO[Request] {
       case req @ Method.PUT -> !! / "photo" / id =>
         (for {
+          _ <- ZIO.logInfo("PUT photo/{id}")
           path <- ZIO.attempt(Files.createFile(getPath(id)))
           _ <- req.body.asStream.via(JpegValidation.pipeline).run(ZSink.drain)
           size <- req.body.asStream.run(ZSink.fromPath(path))
@@ -29,14 +30,17 @@ object PhotosRoutes {
         }
 
       case req @ Method.GET -> !! / "photo" / id =>
-        if (Files.exists(getPath(id))) {
-          ZIO.succeed(Response(
-            status = Status.Ok,
-            body = Body.fromStream(ZStream.fromFile(getPath(id).toFile))
-          ))
-        } else {
-          ZIO.succeed(Response.status(Status.NotFound))
-        }
+        for {
+          _ <- ZIO.logInfo("GET photo/{id}")
+          result <- if (Files.exists(getPath(id))) {
+            ZIO.succeed(Response(
+              status = Status.Ok,
+              body = Body.fromStream(ZStream.fromFile(getPath(id).toFile))
+            ))
+          } else {
+            ZIO.succeed(Response.status(Status.NotFound))
+          }
+        } yield result
 
     }
 }
