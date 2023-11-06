@@ -3,11 +3,11 @@ package auth
 import auth.api.AuthRoutes
 import auth.config.ServiceConfig
 import auth.repo.UserRepositoryImpl
+import core.config.AppConfig
+import core.flyway.FlywayAdapter
 import zio.http.Server
-import zio.{Scope, ZIO, ZIOAppArgs, ZIOAppDefault}
-import config.Config
 import zio.sql.ConnectionPool
-import flyway.FlywayAdapter
+import zio.{Scope, ZIO, ZIOAppArgs, ZIOAppDefault}
 
 object AuthMain extends ZIOAppDefault {
 
@@ -15,16 +15,14 @@ object AuthMain extends ZIOAppDefault {
     val server =
       for {
         _ <- ZIO.logInfo("Starting Auth service")
-        flyway <- ZIO.service[FlywayAdapter.Service]
-        _ <- flyway.migration
         server <- zio.http.Server.serve(AuthRoutes.app)
       } yield ()
     server.provide(
       Server.live,
       ServiceConfig.live,
-      Config.dbLive,
+      AppConfig.dbLive,
       FlywayAdapter.live,
-      Config.connectionPoolLive,
+      AppConfig.connectionPoolLive,
       ConnectionPool.live,
       UserRepositoryImpl.live
     )
