@@ -1,4 +1,4 @@
-import Dependencies.{Auth, Routing, Template, Photos}
+import Dependencies.{Auth, Core, Photos, Routing, Template}
 
 ThisBuild / version := "0.1.0-SNAPSHOT"
 
@@ -50,6 +50,7 @@ lazy val auth = (project in file("auth"))
     assembly / mainClass := Some("auth.AuthMain"),
     assembly / assemblyJarName := "auth.jar"
   )
+  .dependsOn(core)
 
 lazy val routing = (project in file("routing"))
   .settings(
@@ -58,6 +59,7 @@ lazy val routing = (project in file("routing"))
     assembly / mainClass := Some("routing.RoutingMain"),
     assembly / assemblyJarName := "routing.jar"
   )
+  .dependsOn(core)
 
 lazy val photos = (project in file("photos"))
   .settings(
@@ -65,4 +67,10 @@ lazy val photos = (project in file("photos"))
     libraryDependencies ++= Photos.dependencies,
     assembly / mainClass := Some("photos.PhotosMain"),
     assembly / assemblyJarName := "photos.jar"
+  )
+
+lazy val core = (project in file("core"))
+  .settings(
+    name := "team-4-core",
+    libraryDependencies ++= Core.dependencies
   )

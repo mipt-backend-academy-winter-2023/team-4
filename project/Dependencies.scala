@@ -27,7 +27,8 @@ object Dependencies {
   object Routing extends Dependencies {
     override def dependencies: Seq[ModuleID] = Seq(
       zio,
-      pureconfig
+      pureconfig,
+      test
     ).flatten
   }
 
@@ -38,6 +39,15 @@ object Dependencies {
       circe,
       jwt,
       test
+    ).flatten
+  }
+
+  object Core extends Dependencies {
+    override def dependencies: Seq[ModuleID] = Seq(
+      zio,
+      flyway,
+      pureconfig,
+      circe
     ).flatten
   }
 
