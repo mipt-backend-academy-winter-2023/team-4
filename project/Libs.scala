@@ -1,3 +1,4 @@
+import Libs.V
 import sbt._
 
 object Libs {
@@ -18,6 +19,7 @@ object Libs {
     val test = "3.2.15"
 
     val core = "4.0.0-M6"
+    val rezilience = "0.9.3"
   }
 
   val zio: Seq[ModuleID] = Seq(
@@ -47,5 +49,13 @@ object Libs {
   val test: Seq[ModuleID] = Seq(
     "com.softwaremill.sttp.client4" %% "core" % V.core,
     "org.scalatest" %% "scalatest" % V.test % Test
+  )
+
+  val rezilience = List(
+    "nl.vroste" %% "rezilience" % V.rezilience
+  )
+
+  val sttp = Seq(
+    "com.softwaremill.sttp.client4" %% "core" % V.core
   )
 }

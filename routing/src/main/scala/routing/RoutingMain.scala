@@ -3,6 +3,7 @@ package routing
 import core.config.AppConfig
 import core.flyway.FlywayAdapter
 import routing.api.RoutingRoutes
+import routing.clients.MyCircuitBreakerImpl
 import routing.db.GraphRepositoryImpl
 import routing.models.graph.Graph
 import zio.http.Server
@@ -25,7 +26,9 @@ object RoutingMain extends ZIOAppDefault {
       GraphRepositoryImpl.live,
       Graph.graphLayer,
       RoutingRoutes.layer,
-      Server.default
+      Server.default,
+      Scope.default,
+      MyCircuitBreakerImpl.live
     )
   }
 

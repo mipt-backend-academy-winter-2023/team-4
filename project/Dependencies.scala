@@ -28,7 +28,9 @@ object Dependencies {
     override def dependencies: Seq[ModuleID] = Seq(
       zio,
       pureconfig,
-      test
+      test,
+      rezilience,
+      sttp
     ).flatten
   }
 
