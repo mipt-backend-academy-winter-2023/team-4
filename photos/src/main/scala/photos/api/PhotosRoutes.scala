@@ -11,7 +11,7 @@ import photos.utils.JpegValidation
 
 object PhotosRoutes {
 
-  def getPath(id: String) = Paths.get(s"/${id}_image.png")
+  def getPath(id: String) = Paths.get(s"/photos/${id}_image.png")
   private val kMaxSize: Int = 10 * 1024 * 1024
 
   val app: HttpApp[Any, Response] =
