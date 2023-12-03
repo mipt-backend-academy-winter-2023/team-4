@@ -1,5 +1,6 @@
 package routing.api
 
+import core.config.JamClientConfig
 import io.circe.{Json, jawn}
 import nl.vroste.rezilience.CircuitBreaker.{CircuitBreakerOpen, WrappedError}
 import routing.clients.{JamCache, JamClient, MyCircuitBreaker}
@@ -12,14 +13,23 @@ import zio._
 import zio.http._
 import zio.http.model.{Method, Status}
 
+import scala.collection.immutable.Vector
+
 case class RoutingRoutes(graph: Graph) {
 
-  def app: URIO[GraphRepository with MyCircuitBreaker with Server, Nothing] = Server.serve(routes)
+  case class RouteFindResponse(jam: Int, edges: Vector[Edge])
 
-  val jamClient = new JamClient("http://jams:8080")
-  val jamCache = new JamCache()
+  def app: URIO[
+    GraphRepository with MyCircuitBreaker with Server with JamClientConfig with JamCache
+      with JamClient,
+    Nothing
+  ] =
+    Server.serve(routes)
 
-  private def routes: HttpApp[GraphRepository with MyCircuitBreaker, Response] =
+  private def routes: HttpApp[
+    GraphRepository with MyCircuitBreaker with JamClientConfig with JamCache with JamClient,
+    Response
+  ] =
     Http.collectZIO[Request] {
       case request @ Method.POST -> !! / "route" / "find" =>
         (for {
@@ -28,10 +38,11 @@ case class RoutingRoutes(graph: Graph) {
           _ <- logInfo(path.toString())
 
           jamKey = path.length
-          jam <- MyCircuitBreaker.run(jamClient.getJam(jamKey)).map(value => {
-            jamCache.update(jamKey, value)
-            value
-          }).catchAll {
+          jamCache <- ZIO.service[JamCache]
+          jamClient <- ZIO.service[JamClient]
+          jam <- MyCircuitBreaker.run(jamClient.getJam(jamKey)).tap(value =>
+            ZIO.succeed(jamCache.update(jamKey, value))
+          ).catchAll {
             case CircuitBreakerOpen => jamCache.getByKey(jamKey)
             case WrappedError(error) =>
               ZIO.logError(s"Got error from jam client ${error.toString}")
@@ -40,7 +51,7 @@ case class RoutingRoutes(graph: Graph) {
           _ <- logInfo(s"Finding route from nodeId ${path.headOption} to ${path.lastOption}")
           edges <- calculatePath(graph, path)
             .tap(e => logInfo(e.toString()))
-        } yield (jam, edges)).either.map(handle)
+        } yield RouteFindResponse(jam, edges)).either.map(handle)
     }
 
   private def calculatePath(graph: Graph, path: Vector[Long]): Task[Vector[Edge]] = {
@@ -58,15 +69,16 @@ case class RoutingRoutes(graph: Graph) {
     } yield searchAlgorithm.search(start, finish)
   }
 
-  private def handle(response: Either[Throwable, (Int, Vector[Edge])]): Response =
+  private def handle(response: Either[Throwable, RouteFindResponse]): Response =
     response match {
-      case Right((jam, edges)) => Response.json(
+      case Right(RouteFindResponse(jam, edges)) => Response.json(
           Json.obj(
             "jamValue" -> Json.fromInt(jam),
             "route" -> Json.fromString(showPath(edges))
           ).toString()
         )
-      case Left(_) => Response.status(Status.InternalServerError)
+      case Left(_: NoSuchElementException) => Response.status(Status.ServiceUnavailable)
+      case Left(_)                         => Response.status(Status.InternalServerError)
     }
 
   private def showPath(edges: Vector[Edge]): String = {

@@ -14,3 +14,10 @@ class JamCache {
   def update(key: Int, value: Int): Unit =
     map.update(key, value)
 }
+
+object JamCache {
+  val live: ULayer[JamCache] =
+    ZLayer.fromZIO(
+      ZIO.succeed(new JamCache())
+    )
+}

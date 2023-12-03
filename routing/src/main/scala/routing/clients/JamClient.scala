@@ -1,29 +1,39 @@
 package routing.clients
 
-import cats.implicits.{toFlatMapOps, toFunctorOps}
-import sttp.client4.testing.SyncBackendStub.send
-import sttp.client4.{UriContext, asString, basicRequest}
+import cats.implicits.toFlatMapOps
+import core.config.JamClientConfig
+import sttp.client4._
 import zio._
-
 import io.circe.parser._
-import io.circe.generic.auto._
+import io.circe.Decoder
+import io.circe.generic.semiauto.deriveDecoder
+
+case class JamResponse(jam_value: Int)
+
+object JamResponse {
+  // Generate the decoder instance using Circe's automatic derivation
+  implicit val decoder: Decoder[JamResponse] = deriveDecoder
+}
 
 class JamClient(baseUrl: String) {
   def getJam(id: Int): ZIO[Any, Throwable, Int] = {
-    val request = basicRequest
+    DefaultSyncBackend().send(basicRequest
       .get(uri"$baseUrl/jam/$id")
-      .response(asString)
-
-    send(request).flatMap { response =>
-      val jsonResponse = response.body.getOrElse("")
-      val jamValue = for {
-        json <- parse(jsonResponse)
-        jam <- json.hcursor.downField("jam_value").as[Int]
-      } yield jam
-
-      ZIO.fromEither(jamValue)
+      .response(asStringAlways)).flatMap { response =>
+      ZIO.fromEither(for {
+        json <- parse(response.body)
+        resp <- json.as[JamResponse]
+      } yield resp.jam_value)
     }
-
   }
+}
 
+object JamClient {
+  val live: ZLayer[JamClientConfig, Nothing, JamClient] =
+    ZLayer.fromZIO(
+      for {
+        config <- ZIO.service[JamClientConfig]
+        client = new JamClient(config.url)
+      } yield client
+    )
 }
