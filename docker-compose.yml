@@ -62,6 +62,8 @@ services:
       dockerfile: ./DockerfilePhoto
     ports:
       - "7071:8080"
+    volumes:
+      - photos-storage:/photos
 
   photos2:
     build:
@@ -69,6 +71,8 @@ services:
       dockerfile: ./DockerfilePhoto
     ports:
       - "7072:8080"
+    volumes:
+      - photos-storage:/photos
 
   photos3:
     build:
@@ -76,7 +80,16 @@ services:
       dockerfile: ./DockerfilePhoto
     ports:
       - "7073:8080"
+    volumes:
+      - photos-storage:/photos
+
+  jams:
+    image: "vovapolu/jams:0.1.0"
+    ports:
+      - "8090:8080"
+
 
 volumes:
   database-data:
   database-graph-data:
+  photos-storage:

@@ -9,7 +9,8 @@ import zio.{ULayer, ZIO, ZLayer}
 import java.util.Properties
 
 final case class AppConfig(
-    dbConfig: DbConfig
+    dbConfig: DbConfig,
+    jamClientConfig: JamClientConfig
 )
 
 object AppConfig {
@@ -21,6 +22,11 @@ object AppConfig {
       ZIO.attempt(source.loadOrThrow[AppConfig].dbConfig).orDie
     )
   }
+
+  val jamLive: ULayer[JamClientConfig] =
+    ZLayer.fromZIO(
+      ZIO.attempt(source.loadOrThrow[AppConfig].jamClientConfig).orDie
+    )
 
   val connectionPoolLive
       : ZLayer[DbConfig with FlywayAdapter.Service, Throwable, ConnectionPoolConfig] =

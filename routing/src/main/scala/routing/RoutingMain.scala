@@ -3,6 +3,7 @@ package routing
 import core.config.AppConfig
 import core.flyway.FlywayAdapter
 import routing.api.RoutingRoutes
+import routing.clients.{JamCache, JamClient, MyCircuitBreakerImpl}
 import routing.db.GraphRepositoryImpl
 import routing.models.graph.Graph
 import zio.http.Server
@@ -19,13 +20,18 @@ object RoutingMain extends ZIOAppDefault {
 
     server.provide(
       AppConfig.dbLive,
+      AppConfig.jamLive,
       FlywayAdapter.live,
       AppConfig.connectionPoolLive,
       ConnectionPool.live,
       GraphRepositoryImpl.live,
       Graph.graphLayer,
       RoutingRoutes.layer,
-      Server.default
+      Server.default,
+      Scope.default,
+      MyCircuitBreakerImpl.live,
+      JamCache.live,
+      JamClient.live
     )
   }
 
